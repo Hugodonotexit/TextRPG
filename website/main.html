@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text RPG</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<div id="popup" class="popup">
+    <div class="popup-content">
+        <h2>Please Register to continous</h2>   
+        <form id="registerForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<body class="global">
+    <div class="header">
+        <h1>Text RPG</h1>
+    </div>
+    <div class="body">
+        <div id="game-container">
+            <div id="output"></div>
+            <div id="input-container">
+                <input type="text" id="command-input" placeholder="Enter command...">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+
+</html>
