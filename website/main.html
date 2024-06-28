@@ -10,7 +10,7 @@
 
 <div id="popup" class="popup">
     <div class="popup-content">
-        <h2>Please Register to continous</h2>   
+        <h2>Please Register to continous</h2>
         <form id="registerForm">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
@@ -21,7 +21,7 @@
 
 <body class="global">
     <div class="header">
-        <h1>Text RPG</h1>
+        <h1>Welcome to Text RPG</h1>
     </div>
     <div class="body">
         <div id="game-container">
@@ -29,6 +29,81 @@
             <div id="input-container">
                 <input type="text" id="command-input" placeholder="Enter command...">
                 <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <h2>Game Commands</h2>
+        <p>The game has several commands that you can use to interact with the game world and other players. Here's a
+            breakdown of the most important commands:</p>
+        <div class="container">
+            <div class="column">
+                <h3>Communication</h3>
+                <li>
+                    <code>msg [username] [message]</code> - sends a message to <code>[username]</code>
+                </li>
+                <li>
+                    <code>yell [message]</code> - sends a message to all players in your block
+                </li>
+                </li>
+            </div>
+            <div class="column">
+                <h3>Movement</h3>
+                <li>
+                    <code>go [direction]</code> - moves to the specified direction (N, NE, E, SE, S, SW, W, NW)
+                </li>
+                <li>
+                    <code>move [x],[y]</code> - moves to the coordinate in the shortest distance 1 block per second,
+                    eg. <code>travel [0,0]</code>
+                </li>
+                <li>
+                    <code>stop</code> - to stop the travel <command>
+                </li>
+            </div>
+            <div class="column">
+                <h3>Interaction</h3>
+                <li>
+                    <code>take</code> - picks up the item
+                </li>
+                <li>
+                    <code>use [item]</code> - uses the specified item
+                </li>
+                <li>
+                    <code>talk [message]</code> - - initiates a conversation with an npc
+                </li>
+            </div>
+            <div class="column">
+                <h3>Inventory Management</h3>
+                <li>
+                    <code>inv</code> - displays your inventory
+                </li>
+                <li>
+                    <code>drop [item]</code> - drops the specified item from your inventory
+                </li>
+            </div>
+            <div class="column">
+                <h3>Special Interaction</h3>
+                <li>
+                    <code>search</code> - search the current area
+                </li>
+                <li>
+                    <code>rest</code> - rest
+                </li>
+                <li>
+                    <code>sell [item] </code> - sell item to an npc
+                </li>
+                <li>
+                    <code>buy [item] </code> - buy item from an npc
+                </li>
+            </div>
+            <div class="column">
+                <h3>Combat</h3>
+                <li>
+                    <code>attack [target]</code> - attacks the specified target
+                </li>
+                <li>
+                    <code>defend</code> - prepares to defend against the next attack
+                </li>
             </div>
         </div>
     </div>

@@ -119,9 +119,17 @@ void on_message(server* s, connection_hdl hdl, server::message_ptr msg) {
             }
     } else if (type == "command") {
         std::string command = json_msg["data"];
-        std::cout << "Received command from " << players[hdl].username << ": " << command << std::endl;
-
+        std::cout << "Received command from " << players[hdl].uuid << "|" << players[hdl].username << ": " << command << std::endl;
         s->send(hdl, payload, msg->get_opcode());
+        switch (command)
+        {
+        case /* constant-expression */:
+            /* code */
+            break;
+        
+        default:
+            break;
+        }
     }
 }
 

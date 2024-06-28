@@ -1,6 +1,13 @@
 .global{
     background-color: #000c00;
+    color: white;
+    overflow: scroll;
 }
+
+.global::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+}
+
 .header {
     position: -webkit-sticky; /* Safari */
     position: sticky;
@@ -19,13 +26,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 85vh;
 }
 #game-container {
     width: 80%;
     max-width: 1000px;
     background-color: #02000f;
-    padding: 20px;
+    padding: 5px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 #output {
@@ -33,8 +39,8 @@
     overflow-y: auto;
     color: #ffffff;
     border: 1px solid #000000;
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 5px;
+    margin-bottom: 5px;
     background-color: #2e2e2e;
 }
 #input-container {
@@ -42,7 +48,7 @@
 }
 #command-input {
     flex: 1;
-    padding: 10px;
+    padding: 5px;
     color: #ffffff;
     background-color: #000000;
     border: 1px solid #000000;
@@ -89,4 +95,27 @@ button {
     width: 80%;
     max-width: 400px;
     position: relative;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.column {
+    flex: 1 1 calc(33% - 20px);
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.footer h1, h2, h3 {
+    text-align: center;
+}
+
+.footer li {
+    text-align: left;
+    padding: 5px;
+    padding-left: 10%;
 }

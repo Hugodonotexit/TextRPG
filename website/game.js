@@ -24,6 +24,7 @@ sendButton.addEventListener('click', () => {
             type: "command",
             data: command
         };
+        appendOutput("Me: " + command)
         socket.send(JSON.stringify(message));
         commandInput.value = '';
     }
@@ -84,7 +85,9 @@ socket.addEventListener('message', (event) => {
             popup.style.display = "block";
         }
     } else if (message.type === "command") {
-        appendOutput("Me: " + message.data);
+        switch (message.data) {
+
+        }
     } 
 });
 
