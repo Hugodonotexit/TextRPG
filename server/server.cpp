@@ -1,15 +1,16 @@
 #include <iostream>
+#include <omp.h>
 #include <string>
 #include <set>
 #include <map>
 #include <mutex>
-#include <fstream>
 #include <boost/asio.hpp>
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 #include <functional>
 #include <uuid/uuid.h>
 #include "single_include/nlohmann/json.hpp"
+#include "readfile.h"
 
 // Typedefs for convenience
 typedef websocketpp::server<websocketpp::config::asio> server;
@@ -36,68 +37,59 @@ std::string generate_uuid() {
     return std::string(uuid_str);
 }
 
-// Function to read user details from a CSV file
-std::map<std::string, std::string> read_users_from_csv(const std::string& filename) {
-    std::map<std::string, std::string> user_data;
-    std::ifstream file(filename);
-    std::string line;
-
-    while (std::getline(file, line)) {
-        std::istringstream line_stream(line);
-        std::string username, uuid;
-
-        std::getline(line_stream, username, ',');
-        std::getline(line_stream, uuid, ',');
-
-        user_data[username] = uuid;
-    }
-
-    return user_data;
-}
-
-// Function to write user details to a CSV file
-void write_user_to_csv(const std::string& filename, const std::string& username, const std::string& uuid) {
-    std::ofstream file(filename, std::ios::app);
-    file << username << "," << uuid << "\n";
-}
 
 // Function to handle incoming messages
 void on_message(server* s, connection_hdl hdl, server::message_ptr msg) {
+    readfile rf;
     std::string payload = msg->get_payload();
     std::cout << "Received message: " << payload << std::endl;
 
     // Parse the incoming JSON message
     auto json_msg = nlohmann::json::parse(payload);
-    std::string type = json_msg["type"];
+    int type = json_msg["type"];
 
     std::lock_guard<std::mutex> guard(connection_mutex);
 
-    if (type == "register") {
+    if (type == -1) {
         std::string username = json_msg["username"];
-        // Generate a new UUID for the new player
-        std::string uuid = generate_uuid();
+        
+        
 
-        // Store the new player information
-        players[hdl] = Player{username, uuid};
+        
+        
+        if (!rf.check_username("users.csv", username))
+        {
+            // Generate a new UUID for the new player
+            std::string uuid = generate_uuid();
 
-        // Write the new player to the CSV file
-        write_user_to_csv("users.csv", username, uuid);
+            // Write the new player to the CSV file
+            rf.write_user_to_csv("users.csv", username, uuid);
+            
+            // Store the new player information
+            players[hdl] = Player{username, uuid};
 
-        // Send back the registration success message with the UUID
-        nlohmann::json response;
-        response["type"] = "registration";
-        response["success"] = true;
-        response["username"] = username;
-        response["uuid"] = uuid;
-        s->send(hdl, response.dump(), msg->get_opcode());
-
-        std::cout << "Registered new player: " << username << " with UUID: " << uuid << std::endl;
-    } else if (type == "login") {
+            // Send back the registration success message with the UUID
+            nlohmann::json response;
+            response["type"] = -1;
+            response["success"] = true;
+            response["username"] = username;
+            response["uuid"] = uuid;
+            s->send(hdl, response.dump(), msg->get_opcode());
+            std::cout << "Registered new player: " << username << " with UUID: " << uuid << std::endl;
+        } else {
+            nlohmann::json response;
+            response["type"] = -1;
+            response["success"] = false;
+            s->send(hdl, response.dump(), msg->get_opcode());
+            std::cout << "Registered new player fail: " << username << std::endl;
+        }
+        
+    } else if (type == 0) {
         std::string username = json_msg["username"];
         std::string uuid = json_msg["uuid"];
 
         // Check if the provided username and UUID match an existing player
-        auto user_data = read_users_from_csv("users.csv");
+        auto user_data = rf.read_users_from_csv("users.csv");
         bool valid = user_data.find(username) != user_data.end() && user_data[username] == uuid;
 
         if (valid) {
@@ -106,30 +98,53 @@ void on_message(server* s, connection_hdl hdl, server::message_ptr msg) {
 
             // Send back the login success message
             nlohmann::json response;
-            response["type"] = "login";
+            response["type"] = 0;
             response["success"] = true;
             s->send(hdl, response.dump(), msg->get_opcode());
         } else {
             std::cout << "Invalid login attempt for player: " << username << std::endl;
             // Send back the login failure message
             nlohmann::json response;
-            response["type"] = "login";
+            response["type"] = 0;
             response["success"] = false;
             s->send(hdl, response.dump(), msg->get_opcode());
             }
-    } else if (type == "command") {
+    } else if (type == 1) {
         std::string command = json_msg["data"];
         std::cout << "Received command from " << players[hdl].uuid << "|" << players[hdl].username << ": " << command << std::endl;
-        s->send(hdl, payload, msg->get_opcode());
-        switch (command)
-        {
-        case /* constant-expression */:
-            /* code */
-            break;
         
-        default:
-            break;
-        }
+    } else if (type == 2) {
+            std::string command = json_msg["data"];
+            int i = 0;
+            bool isfound = false;
+            while (!std::isspace(command[i]) && i < command.size())
+            {
+                i++;
+            }
+            std::string usr = command.substr(0,i);
+            #pragma omp for
+            for (const auto& pair : players)
+            {
+                if (pair.second.username == usr)
+                {
+                    isfound = true;
+                    if (isfound)
+                    {
+                        nlohmann::json response;
+                        response["type"] = 99;
+                        response["data"] = "Message from " + players[hdl].username + ": " + command.substr(i+1);
+                        s->send(pair.first, response.dump(), msg->get_opcode());
+                    }
+                    break;
+                }
+            }
+            if (!isfound)
+            {
+                nlohmann::json response;
+                response["type"] = 99;
+                response["data"] = "System: " + usr + " not found!";
+                s->send(hdl, response.dump(), msg->get_opcode());
+            }
     }
 }
 

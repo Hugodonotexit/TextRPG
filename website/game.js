@@ -20,12 +20,20 @@ function appendOutput(message) {
 sendButton.addEventListener('click', () => {
     const command = commandInput.value.trim();
     if (command) {
+        appendOutput("Me: " + command);
+        if (command.substr(0,3) == "msg") {
+            const message = {
+                type: 2,
+                data: command.substr(4)
+            };
+            socket.send(JSON.stringify(message));
+        } else {
         const message = {
-            type: "command",
+            type: 1,
             data: command
         };
-        appendOutput("Me: " + command)
         socket.send(JSON.stringify(message));
+        }
         commandInput.value = '';
     }
 });
@@ -46,7 +54,7 @@ socket.addEventListener('open', () => {
     const uuid = localStorage.getItem('UUID');
     if (username && uuid) {
         const message = {
-            type: "login",
+            type: 0,
             username: username,
             uuid: uuid
         };
@@ -66,7 +74,7 @@ socket.addEventListener('message', (event) => {
         return; // Ignore messages not relevant to "ME"
     }
 
-    if (message.type === "registration") {
+    if (message.type === -1) {
         if (message.success) {
             localStorage.setItem('username', message.username);
             localStorage.setItem('UUID', message.uuid);
@@ -76,7 +84,7 @@ socket.addEventListener('message', (event) => {
         } else {
             alert("Registration failed. Please try again.");
         }
-    } else if (message.type === "login") {
+    } else if (message.type === 0) {
         if (message.success) {
             popup.style.display = "none";
             appendOutput('Login successful.');
@@ -84,10 +92,9 @@ socket.addEventListener('message', (event) => {
             alert("Login failed. Please register.");
             popup.style.display = "block";
         }
-    } else if (message.type === "command") {
-        switch (message.data) {
-
-        }
+    } else if (message.type === 99) {
+        
+        appendOutput(message.data);
     } 
 });
 
@@ -106,7 +113,7 @@ registerForm.addEventListener("submit", (event) => {
     const username = document.getElementById("username").value.trim();
     if (username) {
         const message = {
-            type: "register",
+            type: -1,
             username: username
         };
         socket.send(JSON.stringify(message));
