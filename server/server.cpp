@@ -11,17 +11,11 @@
 #include <uuid/uuid.h>
 #include "single_include/nlohmann/json.hpp"
 #include "readfile.h"
+#include "var.h"
 
 // Typedefs for convenience
 typedef websocketpp::server<websocketpp::config::asio> server;
 typedef websocketpp::connection_hdl connection_hdl;
-
-// Struct to hold player information
-struct Player {
-    std::string username;
-    std::string uuid;
-    // Add other player-specific state here
-};
 
 // Server state
 std::set<connection_hdl, std::owner_less<connection_hdl>> connections;
@@ -46,17 +40,12 @@ void on_message(server* s, connection_hdl hdl, server::message_ptr msg) {
 
     // Parse the incoming JSON message
     auto json_msg = nlohmann::json::parse(payload);
-    int type = json_msg["type"];
+    uint_fast8_t type = json_msg["type"];
 
     std::lock_guard<std::mutex> guard(connection_mutex);
 
     if (type == -1) {
-        std::string username = json_msg["username"];
-        
-        
-
-        
-        
+        std::string username = json_msg["username"];     
         if (!rf.check_username("users.csv", username))
         {
             // Generate a new UUID for the new player

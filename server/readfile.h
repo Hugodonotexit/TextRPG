@@ -7,6 +7,7 @@
 #include <mutex>
 #include <sstream>
 #include <vector>
+#include "var.h"
 
 class readfile
 {
